@@ -33,6 +33,8 @@ void successful_distant_attack(int counter, int counter_2);
 void failed_distant_attack(int counter_2);
 void magic_attack(int counter, int counter_2);
 
+struct player players_array[100];  //global variables for convenience
+
 int main(void)
 {
     srand(time(NULL));  //generating random every time
