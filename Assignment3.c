@@ -16,7 +16,7 @@ struct player
     int strength;
     int magic_skills;
     int life_points;
-    int position;
+    int position[2];
 
 };
 
