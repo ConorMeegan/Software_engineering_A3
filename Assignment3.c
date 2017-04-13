@@ -23,17 +23,23 @@ struct player
 struct slot
 {
     char terrain[20];  // Level Ground, City, Hill
-
+    int row, column;
+    struct slot *left;
+    struct slot *right;
+    struct slot *up;
+    struct slot *down;
+    struct slot *own_slot;
 };
 
-void ability_modification(int counter);
-void successful_near_attack(int counter_2);
-void failed_near_attack(int counter, int counter_2);
-void successful_distant_attack(int counter, int counter_2);
-void failed_distant_attack(int counter_2);
-void magic_attack(int counter, int counter_2);
+void ability_modification(int positionA, int positionB, int counter);
+void successful_near_attack(int counter2);
+void failed_near_attack(int counter, int counter2);
+void successful_distant_attack(int counter, int counter2);
+void failed_distant_attack(int counter2);
+void magic_attack(int counter, int counter2);
 
 struct player players_array[100];  //global variables for convenience
+struct slot slots_array[7][7];
 
 int main(void)
 {
@@ -43,7 +49,7 @@ int main(void)
     int number_of_players;
     int number_of_slots = 0;
     int i;
-    int counter;
+    int counter, counter2;
     int random_number;
 
     printf("Welcome to the game Crossfire!\n");
@@ -168,19 +174,105 @@ int main(void)
 
 
 
+    //board creation
+    for (counter = 0; counter < 7; counter++) {
+        for (counter2 = 0; counter2 < 7; counter2++) {
+            random_number = 1 + rand()%3;
+
+            if (random_number == 1)
+            {
+                strcpy(slots_array[counter][counter2].terrain, "City");
+
+            }
+
+            else if (random_number == 2)
+            {
+                strcpy(slots_array[counter][counter2].terrain, "Hill");
+
+            }
+
+            else if (random_number == 3)
+            {
+                strcpy(slots_array[counter][counter2].terrain, "Level Ground");
+
+            }
+
+            slots_array[counter][counter2].row = counter;
+            slots_array[counter][counter2].column = counter2;
+
+            //put pointers to adjacent slots and own slot
+            slots_array[counter][counter2].own_slot = &slots_array[counter][counter2];
+            slots_array[counter][counter2].up = &slots_array[counter-1][counter2];
+            slots_array[counter][counter2].down = &slots_array[counter+1][counter2];
+            slots_array[counter][counter2].left = &slots_array[counter][counter2-1];
+            slots_array[counter][counter2].right = &slots_array[counter][counter2+1];
+
+            if (counter == 0)
+            {
+                slots_array[counter][counter2].left = NULL;
+            }
+            if (counter2 == 0)
+            {
+                slots_array[counter][counter2].up = NULL;
+            }
+            if (counter == 6)
+            {
+                slots_array[counter][counter2].down = NULL;
+            }
+            if (counter2 == 6)
+            {
+                slots_array[counter][counter2].right = NULL;
+            }
+        }
+    }
+
+    //putting players in the slots
+    for (counter = 0; counter < number_of_players; counter++) {
+        players_array[counter].position[0] = 1+(rand()%7);
+        players_array[counter].position[1] = 1+(rand()%7);
+
+    }
+
+    char decision[1];
+
+    for(counter=0; counter<number_of_players; counter++)
+    {
+        printf("\n%s, your position is(%d, %d)", players_array[counter].name, players_array[counter].position[0], players_array[counter].position[1]);
+
+        while(strcmp(decision, "m")!=0 && strcmp(decision, "a")!=0)
+        {
+                printf("\n%s would you like to move or attack (m/a):", players_array[counter].name);
+                scanf("%s", decision);
+        }
+        if(strcmp(decision, "m")==0)
+        {
+            printf("\n%s you have chosen to move.", players_array[counter].name);
+
+
+        }
+        if(strcmp(decision, "a")==0)
+        {
+            printf("\n%s you have chosen to attack.", players_array[counter].name);
+
+
+
+        }
+
+    }
+
 }
 
-void ability_modification(int counter)
+void ability_modification(int positionA, int positionB, int counter)
 {
     //checks what terrain the slot is and modifies the player's attributes based on what this and also the player's current attributes
-    if(strcmp(slots_array[counter].terrain, "Level Ground")==0)  //strcmp evaluates to 0 if the terrain is Level Ground
+    if(strcmp(slots_array[positionA][positionB].terrain, "Level Ground")==0)  //strcmp evaluates to 0 if the terrain is Level Ground
     {
         //prints out the new stats if any of them hav changed based on the slot terrain
         printf("\n%s is now in a Level Ground slot\n", players_array[counter].name);
 
     }
 
-    if(strcmp(slots_array[counter].terrain, "Hill")==0)
+    if(strcmp(slots_array[positionA][positionB].terrain, "Hill")==0)
     {
         if(players_array[counter].dexterity < 50)
         {
@@ -203,7 +295,7 @@ void ability_modification(int counter)
         }
     }
 
-    if(strcmp(slots_array[counter].terrain, "City")==0)
+    if(strcmp(slots_array[positionA][positionB].terrain, "City")==0)
     {
         if(players_array[counter].smartness > 60)
         {
@@ -227,36 +319,36 @@ void ability_modification(int counter)
     }
 }
 
-void successful_near_attack(int counter_2)
+void successful_near_attack(int counter2)
 {
-    players_array[counter_2].life_points = players_array[counter_2].life_points - (players_array[counter_2].strength / 2);
+    players_array[counter2].life_points = players_array[counter2].life_points - (players_array[counter2].strength / 2);
 
-    printf("\nSuccessful near attack. %s life points are now %d\n", players_array[counter_2].name, players_array[counter_2].life_points);
+    printf("\nSuccessful near attack. %s life points are now %d\n", players_array[counter2].name, players_array[counter2].life_points);
 }
 
-void failed_near_attack(int counter, int counter_2)
+void failed_near_attack(int counter, int counter2)
 {
-    players_array[counter].life_points = players_array[counter].life_points - (players_array[counter_2].strength * 0.3);
+    players_array[counter].life_points = players_array[counter].life_points - (players_array[counter2].strength * 0.3);
 
-    printf("\nFailed near attack. %s life points still %d\n", players_array[counter_2].name, players_array[counter_2].life_points);
+    printf("\nFailed near attack. %s life points still %d\n", players_array[counter2].name, players_array[counter2].life_points);
 }
 
-void successful_distant_attack(int counter, int counter_2)
+void successful_distant_attack(int counter, int counter2)
 {
-    players_array[counter_2].life_points = players_array[counter_2].life_points - (players_array[counter].strength * 0.3);
+    players_array[counter2].life_points = players_array[counter2].life_points - (players_array[counter].strength * 0.3);
 
-    printf("\nSuccessful distant attack. %s life points are now %d\n", players_array[counter_2].name, players_array[counter_2].life_points);
+    printf("\nSuccessful distant attack. %s life points are now %d\n", players_array[counter2].name, players_array[counter2].life_points);
 }
 
-void failed_distant_attack(int counter_2)
+void failed_distant_attack(int counter2)
 {
-    printf("\nFailed distant attack. %s life points are still %d\n", players_array[counter_2].name, players_array[counter_2].life_points);
+    printf("\nFailed distant attack. %s life points are still %d\n", players_array[counter2].name, players_array[counter2].life_points);
 }
 
-void magic_attack(int counter, int counter_2)
+void magic_attack(int counter, int counter2)
 {
-    players_array[counter_2].life_points = players_array[counter_2].life_points - ((players_array[counter].magic_skills / 2) + (players_array[counter].smartness * 0.2));
+    players_array[counter2].life_points = players_array[counter2].life_points - ((players_array[counter].magic_skills / 2) + (players_array[counter].smartness * 0.2));
 
-    printf("\nSuccessful magic attack. %s life points are now %d\n", players_array[counter_2].name, players_array[counter_2].life_points);
+    printf("\nSuccessful magic attack. %s life points are now %d\n", players_array[counter2].name, players_array[counter2].life_points);
 }
 
