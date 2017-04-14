@@ -47,7 +47,6 @@ int main(void)
 
     //different variables used
     int number_of_players;
-    int number_of_slots = 0;
     int i;
     int counter, counter2;
     int random_number;
@@ -56,12 +55,12 @@ int main(void)
     printf("Please enter the number of players you would like to have (there is a max of 6 players and minimum of 2): ");
     scanf("%d", &number_of_players);  //gets the number of players in the game from the user
 
-    if(number_of_players > 6)  //implemented if there's an invalid number of players
+    if(number_of_players > 6 || number_of_players < 2)  //implemented if there's an invalid number of players
     {
         while(number_of_players > 6 || number_of_players < 2)
         {
-            printf("Enter a valid number of players you would like to have (max 6): ");
-            scanf("%d \n", &number_of_players);
+            printf("Enter a valid number of players you would like to have (max 6, min 2): ");
+            scanf("%d", &number_of_players);
         }
     }
 
@@ -233,30 +232,140 @@ int main(void)
 
     }
 
-    char decision[1];
 
-    for(counter=0; counter<number_of_players; counter++)
-    {
-        printf("\n%s, your position is(%d, %d)", players_array[counter].name, players_array[counter].position[0], players_array[counter].position[1]);
+    char decision, option_movement, exit_game;
+    int exit = 0, has_not_quit = 0, number_of_players2 = number_of_players, counter3 = 0, ignore = 0;
+    int quit_players[6];
 
-        while(strcmp(decision, "m")!=0 && strcmp(decision, "a")!=0)
-        {
-                printf("\n%s would you like to move or attack (m/a):", players_array[counter].name);
-                scanf("%s", decision);
+    for(counter = 0; counter < 7; counter++) {
+        quit_players[counter] = 10;
+    }
+
+    for (counter = 0; counter < number_of_players; counter++) {
+
+        has_not_quit = 0;
+        ignore = 0;
+
+        if (quit_players[counter] == counter) {
+            has_not_quit = 1;
+         }
+
+
+        if (has_not_quit == 0) {
+            printf("\n%s, your position is (%d, %d).\n", players_array[counter].name, players_array[counter].position[0] + 1, players_array[counter].position[1] + 1);
+            printf("Would you like to move, attack or quit? (m/a/q): ");
+            fflush(stdin);
+            scanf("%c", &decision);
+
+            if (decision == 'm')
+            {
+                exit = 0;
+                while (exit == 0) {
+                    printf("Would you like to move left, right, up or down? (l/r/u/d) ");
+                    fflush(stdin);
+                    scanf("%c", &option_movement);
+
+                    if (option_movement == 'l') {
+                        if (slots_array[players_array[counter].position[0]][players_array[counter].position[1]].left == NULL) {
+                            printf("\nYou are on the edge of the board and can not move this way. Please try again.\n");
+                        }
+                        else {
+                            exit = 1;
+                            players_array[counter].position[1] -= 1;
+                        }
+
+                    }
+                    else if (option_movement == 'r') {
+                        if (slots_array[players_array[counter].position[0]][players_array[counter].position[1]].right == NULL) {
+                            printf("\nYou are on the edge of the board and can not move this way. Please try again.\n");
+                        }
+                        else {
+                            exit = 1;
+                            players_array[counter].position[1] += 1;
+                        }
+
+                    }
+                    else if (option_movement == 'u') {
+                        if (slots_array[players_array[counter].position[0]][players_array[counter].position[1]].up == NULL) {
+                            printf("\nYou are on an edge of the board and can not move this way. Please try again.\n");
+                        }
+                        else {
+                            exit = 1;
+                            players_array[counter].position[0] -= 1;
+                        }
+
+                    }
+                    else if (option_movement == 'd') {
+                        if (slots_array[players_array[counter].position[0]][players_array[counter].position[1]].down == NULL) {
+                            printf("\nYou are on the edge of the board and can not move this way. Please try again.\n");
+                        }
+                        else {
+                            exit = 1;
+                            players_array[counter].position[0] += 1;
+                        }
+
+                    }
+                    else {
+                        printf("Please enter a valid option (l,r,u or d).\n");
+                    }
+                    if (exit == 1) {
+                        printf("Your new position is (%d, %d).\n", players_array[counter].position[0] + 1, players_array[counter].position[1] + 1);
+                        ability_modification(players_array[counter].position[0], players_array[counter].position[1], counter);
+                    }
+
+                }
+            }
+
+            if (decision == 'q')
+            {
+                printf("\nYou have quit the game.\n");
+                quit_players[counter] = counter;
+                number_of_players2 -= 1;
+            }
+
+            if (decision == 'a')
+            {
+                printf("\nIf a player is directly beside you or in your slot you can perform a near attack.");
+                printf("\nIf a player is 3 spaces away you may perform a distant attack.");
+                //this loop searches for any players in adjacent slots
+                for (counter2 = 0; counter2 < number_of_players; counter2++) {
+                    ignore = 0;
+
+                    if (quit_players[counter2] == counter2)
+                    {
+                        ignore = 1;
+                    }
+                    if (ignore = 0)
+                    {
+                        if (slots_array[players_array[counter].position[0]][players_array[counter].position[1]].left == slots_array[players_array[counter2].position[0]][players_array[counter2].position[1]].own_slot)
+                        {
+                            printf("%s is directly to your left");
+                        }
+                    }
+
+                }
+            }
+
+
+            if (counter == number_of_players - 1) {
+                printf("\nWould you like to end the game? (y/n) ");
+                fflush(stdin);
+                scanf("%c", &exit_game);
+
+                if (exit_game == 'y') {
+                    counter = 10;
+                }
+                else {
+                    counter = -1;
+                }
+            }
+
+            if (number_of_players2 < 2) {
+                counter = 3;
+            }
+
         }
-        if(strcmp(decision, "m")==0)
-        {
-            printf("\n%s you have chosen to move.", players_array[counter].name);
 
-
-        }
-        if(strcmp(decision, "a")==0)
-        {
-            printf("\n%s you have chosen to attack.", players_array[counter].name);
-
-
-
-        }
 
     }
 
@@ -268,7 +377,7 @@ void ability_modification(int positionA, int positionB, int counter)
     if(strcmp(slots_array[positionA][positionB].terrain, "Level Ground")==0)  //strcmp evaluates to 0 if the terrain is Level Ground
     {
         //prints out the new stats if any of them hav changed based on the slot terrain
-        printf("\n%s is now in a Level Ground slot\n", players_array[counter].name);
+        printf("\n%s is now in a Level Ground slot, their abilities are unchanged\n", players_array[counter].name);
 
     }
 
@@ -278,19 +387,19 @@ void ability_modification(int positionA, int positionB, int counter)
         {
             players_array[counter].strength = players_array[counter].strength - 10;
 
-            printf("\n%s is now in a Hill slot\n", players_array[counter].name);
+            printf("\n%s is now in a Hill slot, their strength is now %d\n", players_array[counter].name, players_array[counter].strength);
 
         }
         else if(players_array[counter].dexterity >= 60)
         {
             players_array[counter].strength = players_array[counter].strength + 10;
 
-            printf("\n%s is now in a Hill slot\n", players_array[counter].name);
+            printf("\n%s is now in a Hill slot, their strength is now %d\n", players_array[counter].name, players_array[counter].strength);
 
         }
         else if(players_array[counter].dexterity <= 50 && players_array[counter].dexterity < 60)
         {
-            printf("\n%s is now in a Hill slot\n", players_array[counter].name);
+            printf("\n%s is now in a Hill slot, their abilities are unchanged\n", players_array[counter].name);
 
         }
     }
@@ -301,19 +410,19 @@ void ability_modification(int positionA, int positionB, int counter)
         {
             players_array[counter].magic_skills = players_array[counter].magic_skills + 10;
 
-            printf("\n%s is now in a City slot\n", players_array[counter].name);
+            printf("\n%s is now in a City slot, their magic skills are now %d\n", players_array[counter].name, players_array[counter].magic_skills);
 
         }
         else if(players_array[counter].smartness <= 50)
         {
             players_array[counter].dexterity = players_array[counter].dexterity - 10;
 
-            printf("\n%s is now in a City slot\n", players_array[counter].name);
+            printf("\n%s is now in a City slot, their dexterity is now %d\n", players_array[counter].name, players_array[counter].dexterity);
 
         }
         else if(players_array[counter].smartness > 50 && players_array[counter].smartness <= 60)
         {
-            printf("\n%s is now in a City slot\n", players_array[counter].name);
+            printf("\n%s is now in a City slot, their abilities are unchanged\n", players_array[counter].name);
 
         }
     }
