@@ -561,7 +561,7 @@ int main(void)
                                 if (players_array[counter2].strength <= 70)
                                 {
                                     successful_near_attack(counter2);
-                                    if ( players_array[counter2].life_points == 0)
+                                    if ( players_array[counter2].life_points < 1)
                                     {
                                         printf("\n%s now has 0 life points and is out of the game.", players_array[counter2].name);
                                         quit_players[counter2] = counter2;
@@ -593,7 +593,7 @@ int main(void)
                                     if (players_array[counter2].strength <= 70)
                                     {
                                         successful_near_attack(counter2);
-                                        if ( players_array[counter2].life_points == 0)
+                                        if ( players_array[counter2].life_points < 1)
                                         {
                                             printf("\n%s now has 0 life points and is out of the game.", players_array[counter2].name);
                                             quit_players[counter2] = counter2;
@@ -646,7 +646,7 @@ int main(void)
                                 else if (players_array[counter2].dexterity < players_array[counter].dexterity)
                                 {
                                     successful_distant_attack(counter, counter2);
-                                    if ( players_array[counter2].life_points == 0)
+                                    if ( players_array[counter2].life_points < 1)
                                     {
                                         printf("\n%s now has 0 life points and is out of the game.", players_array[counter2].name);
                                         quit_players[counter2] = counter2;
@@ -684,7 +684,7 @@ int main(void)
                                 if (attack_decision == 'y')
                                 {
                                     magic_attack(counter, counter2);
-                                    if ( players_array[counter2].life_points == 0)
+                                    if ( players_array[counter2].life_points < 1)
                                     {
                                         printf("\n%s now has 0 life points and is out of the game.", players_array[counter2].name);
                                         quit_players[counter2] = counter2;
