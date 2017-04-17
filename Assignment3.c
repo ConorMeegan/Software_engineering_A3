@@ -571,6 +571,12 @@ int main(void)
                                 else if (players_array[counter2].strength > 70)
                                 {
                                     failed_near_attack(counter, counter2);
+                                    if ( players_array[counter].life_points < 1)
+                                    {
+                                        printf("\n%s now has 0 life points and is out of the game.", players_array[counter].name);
+                                        quit_players[counter] = counter;
+                                        number_of_players2-=1;
+                                    }
                                 }
                             }
                         }
