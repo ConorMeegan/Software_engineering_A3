@@ -754,13 +754,15 @@ int main(void)
     }
 }
 
+//has to take in the board positions and the player
+//function then carries out the changes based on terrain and the player's attributes
 
 void ability_modification(int positionA, int positionB, int counter)
 {
     //checks what terrain the slot is and modifies the player's attributes based on what this and also the player's current attributes
     if(strcmp(slots_array[positionA][positionB].terrain, "Level Ground")==0)  //strcmp evaluates to 0 if the terrain is Level Ground
     {
-        //prints out the new stats if any of them hav changed based on the slot terrain
+        //prints out the new stats if any of them have changed based on the slot terrain
         printf("\n%s is now in a Level Ground slot, their abilities are unchanged\n", players_array[counter].name);
 
     }
@@ -811,6 +813,9 @@ void ability_modification(int positionA, int positionB, int counter)
         }
     }
 }
+
+//attacking functions that take in either one or two players depending on the type of attack
+//functions carry out the result of the attacks and prnt out the changes to a player's stats
 
 void successful_near_attack(int counter2)
 {
